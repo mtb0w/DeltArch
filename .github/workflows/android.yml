@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch: # This adds a "Run workflow" button on the web UI so you can trigger it manually
+  workflow_dispatch: # Allows you to manually click "Run workflow" on GitHub
 
 jobs:
   build:
@@ -22,11 +22,18 @@ jobs:
     - name: Make Gradle Executable
       run: chmod +x ./gradlew
 
-    - name: Build Debug APK
-      run: ./gradlew assembleDebug
+    # CHANGED: Targeted the specific build flavors used by this project
+    - name: Build Debug APKs
+      run: ./gradlew :lemuroid-app:assembleFreeDynamicDebug :lemuroid-app:assemblePlayDynamicDebug
 
-    - name: Upload APK Artifact
+    - name: Upload Standard APKs
       uses: actions/upload-artifact@v4
       with:
-        name: my-app-apk
-        path: app/build/outputs/apk/debug/*.apk
+        name: lemuroid-apks
+        path: "lemuroid-app/build/outputs/apk/**/*.apk"
+
+    - name: Upload Android App Bundles (AAB)
+      uses: actions/upload-artifact@v4
+      with:
+        name: lemuroid-bundles
+        path: "lemuroid-app/build/outputs/bundle/**/*.aab"
